@@ -122,6 +122,7 @@ class CosmicPlugin
 
          let nonce = '<?php echo wp_create_nonce('wp_rest'); ?>'
          let btn = document.getElementById('save')
+         let post_id = '<?php echo get_the_ID() ?>';
 
          btn.onclick = () => {
             let feedbackArea = document.getElementById('feedbackArea').value
@@ -130,6 +131,7 @@ class CosmicPlugin
             let rating_3 = document.getElementById('rating_3').value
             let rating_4 = document.getElementById('rating_4').value
             let rating_5 = document.getElementById('rating_5').value
+            console.log(post_id);
             const req = new XMLHttpRequest();
             req.open('POST', '<?php echo get_rest_url(null, 'feedback-form/v1/send-feedback'); ?>', true);
             req.onload = () => {
@@ -145,7 +147,7 @@ class CosmicPlugin
             req.setRequestHeader("Content-Type", "multipart/form-data");
 
             req.setRequestHeader("X-WP-Nonce", nonce);
-            req.send(`rating=${rate}&feedback=${feedbackArea}`);
+            req.send(`rating=${rate}&feedback=${feedbackArea}&post_id=${post_id}`);
 
          }
       </script>
@@ -165,25 +167,26 @@ class CosmicPlugin
    {
       global $wpdb;
       $headers = $data->get_headers();
-      $params = $data->get_params();
       $nonce = $headers['x_wp_nonce'][0];
 
       if (!wp_verify_nonce($nonce, 'wp_rest')) {
          return new WP_REST_Response('Feedback not send', 401);
       }
+
+      $rating = $_POST['rating'];
+      $feedback = $_POST['feedback'];
+      $post_id = $_POST['post_id'];
+
       $posts = wp_insert_post([
          'post_type' => 'feedback_form',
          'post_title' => 'Feedback',
-         'post_status' => 'New'
+         'post_status' => 'New',
+         'post_rating' => $rating,
+         'post_feedback' => $feedback,
       ]);
-      $id = get_the_ID();
 
       if ($posts) {
-
-         $rating = $_POST['rating'];
-         $feedback = $_POST['feedback'];
-         $sql = $wpdb->query("INSERT INTO `feedbacksiguess` (rate_star,feedback,post_id) VALUES('{$rating}','{$feedback}','{$id}')");
-
+         $sql = $wpdb->insert('feedbacksiguess', array('rate_star' => $rating, 'feedback' => $feedback, 'post_id' => $post_id));
          if ($sql) {
             return new WP_REST_Response('Thank you for your feedback', 200);
          }

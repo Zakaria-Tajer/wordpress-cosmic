@@ -76,15 +76,30 @@ class CosmicPlugin
    { ?>
       <h1 class="font-Poppins text-center mt-4">Give us your Feedback</h1>
 
-      <div class="w-1/2 mx-auto bg-gray-400 pt-3 space-y-6">
+      <div class="w-1/2 mx-auto bg-gray-400 pt-3 space-y-6 py-2">
          <div class="mx-auto w-3/4 bg-white space-y-3 px-6 py-7 rounded-md">
             <h4 class="font-Poppins">Rate your experience with our product...</h4>
             <div class="flex space-x-3 items-center">
-               <input class="w-14 text-lg h-12 font-Poppins border-[1px] border-gray-400  text-center rounded-lg hover:bg-[#333] hover:text-white hover:duration-700 cursor-pointer" value="1" name="rating_1" id="rating_1" onclick="getValue(this)">
-               <input class="w-14 text-lg h-12 font-Poppins border-[1px] border-gray-400  text-center rounded-lg hover:bg-[#333] hover:text-white hover:duration-700 cursor-pointer" value="2" name="rating-2" id="rating_2" onclick="getValue(this)">
-               <input class="w-14 text-lg h-12 font-Poppins border-[1px] border-gray-400  text-center rounded-lg hover:bg-[#333] hover:text-white hover:duration-700 cursor-pointer" value="3" name="rating-3" id="rating_3" onclick="getValue(this)">
-               <input class="w-14 text-lg h-12 font-Poppins border-[1px] border-gray-400  text-center rounded-lg hover:bg-[#333] hover:text-white hover:duration-700 cursor-pointer" value="4" name="rating-4" id="rating_4" onclick="getValue(this)">
-               <input class="w-14 text-lg h-12 font-Poppins border-[1px] border-gray-400  text-center rounded-lg hover:bg-[#333] hover:text-white hover:duration-700 cursor-pointer" value="5" name="rating-5" id="rating_5" onclick="getValue(this)">
+               <div class="w-14 text-lg h-12 font-Poppins border-[1px] border-gray-400  text-center rounded-lg hover:bg-[#333] hover:text-white hover:duration-700 cursor-pointer flex items-center justify-center" name="rating_1" id="rating_1" onclick="getValue(document.getElementById('inputValue1'),document.getElementById('rating_1'))">
+                  1
+                  <input type="hidden" value="1" id="inputValue1">
+               </div>
+               <div class="w-14 text-lg h-12 font-Poppins border-[1px] border-gray-400  text-center rounded-lg hover:bg-[#333] hover:text-white hover:duration-700 cursor-pointer flex items-center justify-center" name="rating-2" id="rating_2" onclick="getValue(document.getElementById('inputValue2'),document.getElementById('rating_2'))">
+                  2
+                  <input type="hidden" value="2" id="inputValue2">
+               </div>
+               <div class="w-14 text-lg h-12 font-Poppins border-[1px] border-gray-400  text-center rounded-lg hover:bg-[#333] hover:text-white hover:duration-700 cursor-pointer flex items-center justify-center" name="rating-3" id="rating_3" onclick="getValue(document.getElementById('inputValue3'),document.getElementById('rating_3'))">
+                  3
+                  <input type="hidden" value="3" id="inputValue3">
+               </div>
+               <div class="w-14 text-lg h-12 font-Poppins border-[1px] border-gray-400  text-center rounded-lg hover:bg-[#333] hover:text-white hover:duration-700 cursor-pointer flex items-center justify-center" name="rating-4" id="rating_4" onclick="getValue(document.getElementById('inputValue4'),document.getElementById('rating_4'))">
+                  4
+                  <input type="hidden" value="4" id="inputValue4">
+               </div>
+               <div class="w-14 text-lg h-12 font-Poppins border-[1px] border-gray-400  text-center rounded-lg hover:bg-[#333] hover:text-white hover:duration-700 cursor-pointer flex items-center justify-center" name="rating-5" id="rating_5" onclick="getValue(document.getElementById('inputValue5'),document.getElementById('rating_5'))">
+                  5
+                  <input type="hidden" value="5" id="inputValue5">
+               </div>
                <div class="text-lg h-12 flex items-center justify-center">
                   <span class="dashicons dashicons-star-filled  ml-4 text-green-600"></span>
                   <span class="ml-2 font-Poppins">Stars</span>
@@ -97,13 +112,6 @@ class CosmicPlugin
             <button class="px-10 py-2 bg-[#333] text-white rounded" id="save">Submit</button>
          </div>
 
-         <div class="mx-auto bg-white space-y-3 px-6 py-4 w-3/4 rounded-md flex items-center space-x-2">
-            <div class="w-7 h-7 rounded-full bg-green-600 flex items-center justify-center mt-2">
-               <span class="dashicons dashicons-yes-alt bg-transparent text-white"></span>
-
-            </div>
-            <h3 class="font-Poppins text-sm">Thanks for the feedback!</h3>
-         </div>
       </div>
    <?php }
 
@@ -114,10 +122,17 @@ class CosmicPlugin
 
       <script>
          let rate;
+         let rating_1 = document.getElementById('rating_1')
+         let rating_2 = document.getElementById('rating_2')
+         let rating_3 = document.getElementById('rating_3')
+         let rating_4 = document.getElementById('rating_4')
+         let rating_5 = document.getElementById('rating_5')
 
-         function getValue(e) {
+         function getValue(e, v) {
             console.log(e.value);
             rate = e.value
+            v.style.backgroundColor = '#333'
+            v.style.color = 'white'
          }
 
          let nonce = '<?php echo wp_create_nonce('wp_rest'); ?>'
@@ -126,11 +141,6 @@ class CosmicPlugin
 
          btn.onclick = () => {
             let feedbackArea = document.getElementById('feedbackArea').value
-            let rating_1 = document.getElementById('rating_1').value
-            let rating_2 = document.getElementById('rating_2').value
-            let rating_3 = document.getElementById('rating_3').value
-            let rating_4 = document.getElementById('rating_4').value
-            let rating_5 = document.getElementById('rating_5').value
             console.log(post_id);
             const req = new XMLHttpRequest();
             req.open('POST', '<?php echo get_rest_url(null, 'feedback-form/v1/send-feedback'); ?>', true);
@@ -140,6 +150,10 @@ class CosmicPlugin
                      let data = req.response.trim();
 
                      console.log(data);
+                     if(data == "Thank you for your feedback"){
+                        console.log('what');
+                        alert('Thank you for your feedback')
+                     }
                   }
                }
             };
@@ -188,7 +202,7 @@ class CosmicPlugin
       if ($posts) {
          $sql = $wpdb->insert('feedbacksiguess', array('rate_star' => $rating, 'feedback' => $feedback, 'post_id' => $post_id));
          if ($sql) {
-            return new WP_REST_Response('Thank you for your feedback', 200);
+            echo 'Thank you for your feedback';
          }
       }
    }
